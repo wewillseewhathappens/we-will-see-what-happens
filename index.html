@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ataraxia</title>
+    
+
+<style>
+    /* Global Reset and Base Layout */
+    * { box-sizing: border-box; }
+
+    :root {
+        --bg-color: #fff;
+        --text-color: #333;
+        --header-bg: #eee;
+        --border-color: #ddd;
+        --hover-bg: #f5f5f5;
+        --icon-color: #333; /* Dark icons for light mode */
+    }
+
+    body.dark-mode {
+        --bg-color: #363a3d;
+        --text-color: #e0e0e0;
+        --header-bg: #2b2d2f;
+        --border-color: #373538;
+        --hover-bg: #444;
+        --icon-color: #fff; /* White icons for dark mode */
+    }
+
+    body {
+        margin: 0;
+        font-family: monospace;
+        line-height: 1.6;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    /* Header */
+    .header {
+        width: 100%;
+        height: 100px;
+        background-color: var(--header-bg);
+        padding: 0px 50px;
+        position: relative;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.4s ease;
+    }
+
+    /* Control Buttons Layout */
+    .controls {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    /* Target both standard and custom icons for theme color */
+    #music-btn, #theme-btn {
+        font-size: 18px;
+        cursor: pointer;
+        user-select: none;
+        color: var(--icon-color);
+        transition: color 0.4s ease, transform 0.3s ease;
+        opacity: 0.8;
+    }
+    
+    .menu-icon {
+        font-size: 24px;
+        cursor: pointer;
+        user-select: none;
+        color: var(--icon-color);
+        transition: color 0.4s ease, transform 0.3s ease;
+        opacity: 0.8;
+    }
+
+    #music-btn:hover, #theme-btn:hover, .menu-icon:hover { 
+        transform: scale(1.2);
+        opacity: 1; 
+    }
+
+    /* Main content */
+    main {
+        flex-grow: 1;
+        width: 100%;
+        max-width: 900px;
+        margin: 60px auto;
+        padding: 0 38px;
+    }
+
+    h3 { font-size: 2.5em; margin-bottom: 0.5em; font-weight: bold; color: var(--text-color); }
+    
+    h4 { 
+        font-weight: bold; 
+        margin-top: 1.5em;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 5px;
+        color: var(--text-color); 
+    }
+
+    .work-title-link {
+        display: block;
+        font-size: 1.2em;
+        margin: 10px 0;
+        padding: 5px 0;
+        color: var(--text-color);
+        text-decoration: none;
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.2s;
+    }
+    .work-title-link:hover { background-color: var(--hover-bg); }
+
+    p { font-size: 1.1em; margin-bottom: 1.5em; white-space: pre-wrap; }
+
+    .page-section {
+        display: none;
+        padding-bottom: 50px;
+        display: flex;
+        gap: 50px;
+        width: 100%;
+        position: relative;
+    }
+
+    /* Dynamic Page Transition Animation */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-content { 
+        flex-grow: 1; 
+        min-width: 0; 
+        animation: fadeInUp 0.6s ease-out; /* This makes transitions dynamic */
+    }
+
+    .menu-icon.is-active {
+        transform: rotate(90deg); 
+        font-size: 32px; 
+    }
+
+    .menu { 
+        display: none; 
+        flex-direction: column; 
+        background-color: var(--bg-color); 
+        position: absolute; 
+        top: 65px; 
+        right: 50px; 
+        border: 1px solid var(--border-color); 
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+        z-index: 100; 
+        padding: 10px; 
+        min-width: 180px; 
+    }
+    
+    .menu a { 
+        text-decoration: none; 
+        color: var(--text-color); 
+        padding: 8px 10px; 
+        border-bottom: 1px solid var(--border-color); 
+    }
+   
+    @keyframes menuFade {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+    }
+
+    .menu[style*="display: flex"] {
+        animation: menuFade 0.3s ease-out;
+    }
+
+    .footer { 
+        width: 100%; 
+        background-color: var(--header-bg); 
+        text-align: center; 
+        color: var(--text-color); 
+        padding: 30px 0; 
+        margin-top: auto; 
+        border-top: 1px solid var(--border-color); 
+        font-size: 0.9em; 
+        transition: background-color 0.4s ease;
+    }
+
+    .toc-box {
+        position: sticky;
+        top: 100px;
+        width: 200px;
+        flex-shrink: 0;
+        height: fit-content;
+        z-index: 90;
+    }
+
+    .toc-box h4 { 
+        margin: 0 0 10px 0; 
+        font-size: 1.1em; 
+        color: var(--text-color); 
+        opacity: 0.6;
+        border-bottom: 1px solid var(--border-color); 
+        text-transform: uppercase; 
+        font-weight: normal; 
+        letter-spacing: 1px; 
+    }
+
+    .toc-box a { 
+        display: block; 
+        font-size: 0.9em; 
+        padding: 3px 0; 
+        color: var(--text-color); 
+        text-decoration: none; 
+        transition: color 0.2s; 
+        opacity: 0.7;
+    }
+    .toc-box a.active { font-weight: bold; opacity: 1; }
+    .toc-box a:hover { opacity: 1; }
+    
+    @media (max-width: 1000px) {
+        .page-section { flex-direction: column; gap: 20px; }
+        .toc-box { position: static; width: 100%; order: 1; }
+        .page-content { order: 2; }
+        .toc-box h4 { display: none; }
+        .toc-box a { display: inline-block; margin-right: 15px; }
+    }
+</style>
+
+</head>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyC1Ua0JQjOGUwoTcsJMMYEIsNnj2AEs9Ck",
+    authDomain: "we-will-see-what-happens.firebaseapp.com",
+    projectId: "we-will-see-what-happens",
+    storageBucket: "we-will-see-what-happens.firebasestorage.app",
+    messagingSenderId: "195116663276",
+    appId: "1:195116663276:web:3060461c56b9f3c66880c9",
+    measurementId: "G-ZLE0S122J0"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+let currentWorks = [];
+
+// Define category titles as a constant for easy reference
+const CATEGORY_TITLES = { 
+    'unprofessional': '不务正业的时候', 
+    'brainstorm': '一些自嗨的脑洞', 
+    'suisuinian': '岁岁念', 
+    'home': 'Home (Home)' 
+};
+
+// --- CORE DATA FUNCTIONS ---
+
+/**
+ * Fetches works from Firebase and stores them globally.
+ */
+async function setupFirebase() {
+    try {
+        const q = query(collection(db, "works"), orderBy("order"));
+        const querySnapshot = await getDocs(q);
+        currentWorks = querySnapshot.docs.map(doc => doc.data());
+        console.log("Works fetched:", currentWorks); // Kept original console.log
+    } catch (error) {
+        console.error("Error fetching works:", error);
+    }
+}
+
+/**
+ * Groups works of a specific category by their storyId for list/TOC rendering.
+ * Encapsulates the repetitive logic from renderCategoryList and renderTOC.
+ */
+function getGroupedWorks(category) {
+    const filteredWorks = currentWorks.filter(w => w.category === category);
+    const stories = {};
+
+    // 1. Group works by storyId
+    filteredWorks.forEach(chap => {
+        if (!stories[chap.storyId]) {
+            stories[chap.storyId] = { title: chap.storyTitle, chapters: [] };
+        }
+        stories[chap.storyId].chapters.push(chap);
+    });
+
+    // 2. Sort chapters within stories
+    for (let storyId in stories) {
+        stories[storyId].chapters.sort((a, b) => (a.order || 0) - (b.order || 0));
+    }
+
+    return { stories, filteredWorks }; // Return both grouped and filtered list for checks
+}
+
+
+/**
+ * Renders the list view for a given category.
+ */
+function renderCategoryList(category, contentContainer) {
+    const { stories, filteredWorks } = getGroupedWorks(category); // Use grouped data
+    
+    let html = `<h2>${CATEGORY_TITLES[category] || 'Category'}</h2>`;
+    
+    if (filteredWorks.length === 0) {
+        // Kept original text, but category is now defined by constant above
+        html += `<p>目前此分类下作品。</p>`; 
+    } else {
+        // 3. Iterate through the stories
+        for (let storyId in stories) {
+            const story = stories[storyId];
+            // Display the Story Title prominently (e.g., "恶龙", "高塔")
+            html += `<h4>${story.title}</h4>`; 
+            
+            story.chapters.forEach(work => {
+                // Display the Chapter Title (e.g., "女巫和公主")
+                html += `<a href="#${category}/${work.chapterId}" class="work-title-link">${work.title}</a>`; 
+            });
+        }
+    }
+    contentContainer.innerHTML = html;
+}
+
+/**
+ * Renders the content of a specific chapter, including navigation links.
+ */
+function renderWorkContent(category, chapterId, contentContainer) {
+    const filteredWorks = currentWorks.filter(w => w.category === category);
+    const chapter = filteredWorks.find(c => c.chapterId === chapterId);
+    
+    if (!chapter) {
+        contentContainer.innerHTML = `<h2>章节未找到</h2><p>抱歉，章节 ID: ${chapterId} 不存在。</p>`;
+        return;
+    }
+
+    const storyChapters = filteredWorks
+        .filter(c => c.storyId === chapter.storyId)
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    const chapterIndex = storyChapters.findIndex(c => c.chapterId === chapterId);
+
+    let html = `<h2>${chapter.title}</h2><p>${chapter.content}</p>`;
+    html += `<a href="#${category}" style="display: block; margin-top: 30px; font-size: 0.9em;">&larr; 返回列表</a>`;
+
+    // Previous/Next navigation links
+    html += `<p style="margin-top: 20px; text-align: right">`;
+    if (chapterIndex > 0) html += `<a href="#${category}/${storyChapters[chapterIndex-1].chapterId}" style="margin-right: 20px;">&larr; Previous</a>`;
+    if (chapterIndex < storyChapters.length - 1) html += `<a href="#${category}/${storyChapters[chapterIndex+1].chapterId}">Next &rarr;</a>`;
+    html += `</p>`;
+
+    contentContainer.innerHTML = html;
+}
+
+/**
+ * Renders the Table of Contents (TOC) for the sidebar.
+ */
+function renderTOC(category, activeChapterId = null) {
+    const tocBox = document.querySelector(`#${category} .toc-box`);
+    if (!tocBox) return;
+
+    const { stories } = getGroupedWorks(category); // Use grouped data
+
+    let linksHtml = '';
+    for (let storyId in stories) {
+        const story = stories[storyId];
+        // This is the Story Title
+        linksHtml += `<h4>${story.title}</h4>`; 
+        story.chapters.forEach(chap => {
+            const isActive = chap.chapterId === activeChapterId ? 'active' : '';
+            // This is the Chapter Title
+            linksHtml += `<a href="#${category}/${chap.chapterId}" class="${isActive}">${chap.title}</a>`;
+        });
+    }
+
+    tocBox.innerHTML = linksHtml;
+}
+
+
+// --- UI/NAVIGATION FUNCTIONS ---
+
+/**
+ * Toggles the visibility of the mobile menu.
+ */
+function toggleMenu() {
+    const menu = document.getElementById("menu");
+    const menuIcon = document.querySelector(".menu-icon");
+    const isMenuOpen = menu.style.display === "flex";
+
+    if (isMenuOpen) { 
+        menu.style.display = "none"; 
+        menuIcon.innerHTML = "&#9776;"; 
+        menuIcon.classList.remove("is-active"); 
+    } else { 
+        menu.style.display = "flex"; 
+        menuIcon.innerHTML = "&times;"; 
+        menuIcon.classList.add("is-active"); 
+    }
+}
+window.toggleMenu = toggleMenu;
+
+// --- ADD THESE INSIDE YOUR EXISTING SCRIPT MODULE ---
+
+function toggleDarkMode() {
+    const isDark = document.body.classList.toggle('dark-mode');
+    document.getElementById('theme-btn').innerHTML = isDark ? '☀' : '☾';
+}
+// This line makes the function "visible" to the HTML buttons
+window.toggleDarkMode = toggleDarkMode;
+
+function toggleMusic() {
+    const music = document.getElementById('bg-music');
+    const btn = document.getElementById('music-btn');
+    if (music.paused) {
+        music.play();
+        btn.innerHTML = '♫';
+    } else {
+        music.pause();
+        btn.innerHTML = '♪';
+    }
+}
+window.toggleMusic = toggleMusic;
+
+/**
+ * Main routing function based on the URL hash.
+ */
+function renderPage() {
+    const hash = window.location.hash.substring(1);
+    const hashParts = hash.split('/');
+    let mainCategory = hashParts[0] || 'home';
+    let workId = hashParts[1] || null;
+
+    document.querySelectorAll('.page-section').forEach(section => section.style.display = 'none');
+    
+    const targetSection = document.getElementById(mainCategory);
+    
+    if (!targetSection) { 
+        document.getElementById('home').style.display = 'block'; 
+        return; 
+    }
+    
+    // Use 'block' for 'home', 'flex' for other sections (matching original logic)
+    targetSection.style.display = (mainCategory === 'home') ? 'block' : 'flex'; 
+    
+    const contentContainer = targetSection.querySelector('.page-content');
+    
+    if (contentContainer) { 
+        if (workId) { 
+            renderWorkContent(mainCategory, workId, contentContainer); 
+            renderTOC(mainCategory, workId); 
+        } else { 
+            renderCategoryList(mainCategory, contentContainer); 
+            renderTOC(mainCategory, null); 
+        }
+    }
+
+    window.scrollTo(0, 0);
+
+    // Close menu after navigation
+    const menu = document.getElementById("menu");
+    if (menu.style.display === "flex") { toggleMenu(); } 
+}
+
+// --- INITIALIZATION ---
+
+window.onload = async () => { 
+    await setupFirebase(); 
+    renderPage(); 
+};
+window.onhashchange = renderPage;
+
+</script>
+
+<body>
+    <header class="header">
+    <audio id="bg-music" loop src="fallen_down.mp3"></audio>
+    <div style="display:flex; gap:20px; align-items:center;">
+        <div id="music-btn" style="cursor:pointer" onclick="toggleMusic()">♪</div>
+        <div id="theme-btn" style="cursor:pointer" onclick="toggleDarkMode()">☾</div>
+        <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+            <nav id="menu" class="menu">
+                <a href="#home">Home</a> 
+                <a href="#unprofessional">不务正业的时候</a>
+                <a href="#brainstorm">一些自嗨的脑洞</a>
+                <a href="#suisuinian">岁岁念</a>
+            </nav>    
+    </header>
+
+
+<main>
+    <section id="home" class="page-section" style="display: block;">
+        <h3>碎碎念</h3>
+        <p>hi，按按菜单嘛？</p>
+        <p>右上角右上角</p>
+    </section>
+
+    <section id="unprofessional" class="page-section">
+        <div class="toc-box"></div>
+        <div class="page-content"></div>
+    </section>
+
+    <section id="brainstorm" class="page-section">
+        <div class="toc-box"></div>
+        <div class="page-content"></div>
+    </section>
+
+    <section id="suisuinian" class="page-section">
+        <div class="toc-box"></div>
+        <div class="page-content"></div>
+    </section>
+</main>
+
+<footer class="footer">
+    <p> </p>
+    <p> </p>
+    <p> </p>
+    <p>thanks for scrolling ;)</p>
+
+    <p>music by toby fox - fallen down</p>
+</footer>
+
+</body>
+</html>
